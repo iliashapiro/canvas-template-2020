@@ -1,0 +1,140 @@
+<div ng-controller="C3DirectiveCtrl"  
+ng-if=" $root.defaults.year && $root.defaults.region && $root.defaults.period && $root.defaults.account && $root.defaults.department "
+ng-style="{'margin-top': $root.isPrinting ? '0px':(120)+'px'}"
+style="   background-color: transparent; padding-top:10px;  -webkit-transition:margin-top 1s; transition-property:margin-top; transition-duration: 1s;" 
+ng-click="$root.topOffSet = $root.defaultOffSet; $root.indexOver = '';" 
+ > 
+  
+<style>
+		.c3-region-0 {
+		 fill: red;
+	 }
+	 .c3-region.foo {
+		 fill: green;
+	 }
+	 .legend span {
+			 width: 33.333333%;
+			 display: inline-block;
+			 text-align: center;
+			 cursor: pointer;
+			 color: white;
+	 }
+</style>
+ <!-- <div class="row"    >
+ 	<div class="col-md-12">
+		<span class="pull-left" style="font-size:initial; font-weight:400; ">
+		 
+			<strong>{{$root.defaults.year}}  | {{$root.defaults.region}} </strong>
+		</span>
+	</div>
+</div>   -->
+<div class="row"    >
+ 
+
+	  <c3-namedmdx-chart 
+		chart-target-id = "1"
+		component-height = "300"
+		dimension-column-width="150"
+		mdx-id="P&L"  
+		heading="{{$root.defaults.year}} Revenue by Account "
+		cube-name="General Ledger"  
+		mdx-param='{{mdxParam}}'
+		dimension-alias="{{dimensionAlias}}"
+		class-name="col-md-4" 
+		show-chart="true" 
+		chart-type="area" 
+		chart-ledgend-position="absolute"
+		chart-driver="period" 
+		chart-dimension-driver= "Period"
+		chart-row-driver="account"
+		chart-row-driver-dimension-name="Account"
+		chart-row-dimension-driver= "1"
+		chart-dimension-colors = "{{dimensionColors}}"
+		chart-position="inside"
+		chart-ledgends-show=""
+		chart-rotate-axis="false"
+		decimal-format-val = "0"
+		>
+	</c3-namedmdx-chart>    
+	 
+<c3-namedmdx-chart 
+chart-target-id = "2"
+component-height = "300"
+dimension-column-width="150"
+mdx-id="P&L 2"  
+heading="{{$root.defaults.year}} Revenue by Department "
+cube-name="General Ledger"  
+mdx-param='{{mdxParam}}'
+dimension-alias="{{dimensionAlias}}"
+class-name="col-md-4" 
+show-chart="true" 
+chart-type="area" 
+chart-ledgend-position="absolute"
+chart-driver="period" 
+chart-dimension-driver= "Period"
+chart-row-driver="department"
+chart-row-driver-dimension-name="Department"
+chart-row-dimension-driver= "1"
+chart-dimension-colors = "{{dimensionColors}}"
+chart-position="inside"
+chart-ledgends-show=""
+chart-rotate-axis="false"
+decimal-format-val = "0">
+</c3-namedmdx-chart>    
+<c3-namedmdx-chart 
+chart-target-id = "3"
+component-height = "300"
+dimension-column-width="150"
+mdx-id="P&L 3"  
+heading="{{$root.defaults.year}} Revenue by Region"
+cube-name="General Ledger"  
+mdx-param='{{mdxParam}}'
+dimension-alias="{{dimensionAlias}}"
+class-name="col-md-4" 
+show-chart="true" 
+chart-type="area" 
+chart-ledgend-position="absolute"
+chart-driver="period" 
+chart-dimension-driver= "Period"
+chart-row-driver="region"
+chart-row-driver-dimension-name="Region"
+chart-row-dimension-driver= "1"
+chart-dimension-colors = "{{dimensionColors}}"
+chart-position="inside"
+chart-ledgends-show=""
+chart-rotate-axis="false"
+decimal-format-val = "0">
+</c3-namedmdx-chart>    
+ 
+ </div>
+ <div class="row"    >
+		<c3-namedmdx-chart 
+		chart-target-id = "4"
+		component-height = "auto"
+		dimension-column-width="150"
+		mdx-id="P&L"  
+		heading="{{$root.defaults.year}} Revenue by Account  "
+		cube-name="General Ledger"  
+		mdx-param='{{mdxParam}}'
+		dimension-alias="{{dimensionAlias}}"
+		class-name="col-md-12" 
+		show-chart=""
+		hide-chart="true"  
+		chart-type="area" 
+		 
+		chart-driver="period" 
+		chart-dimension-driver= "Period"
+		chart-row-driver="account"
+		chart-row-driver-dimension-name="Account"
+		chart-row-dimension-driver= "1"
+		chart-dimension-colors = ""
+		chart-position="outside"
+		chart-ledgends-show=""
+		chart-rotate-axis="false"
+		decimal-format-val = "0">
+
+	</c3-namedmdx-chart>    
+	</div>
+	 
+
+</div>

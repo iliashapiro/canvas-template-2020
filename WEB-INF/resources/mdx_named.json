@@ -1,0 +1,127 @@
+[
+	{
+		"id": "P&L",
+		"mdx": [
+      "SELECT  {   {[Period].[Year].children}    } ON COLUMNS,",
+      "NON EMPTY { [Account].[{{Account}}],[Account].[{{Account}}].children }  ON ROWS",
+      "FROM [General Ledger]",
+      "WHERE ([Year].[{{Year}}], [Version].[Actual] , [Department].[{{Department}}],   [General Ledger Measure].[Amount], [Region].[{{Region}}], [Currency].[Local])" 
+    ],
+		"description":"",
+		"mdxParams": [
+			{ "name":"Year", "value":"2012" },
+      { "name":"Region", "value":"3" },
+      { "name":"Period", "value":"Year" },
+      { "name":"Account", "value":"1" },
+      { "name":"Department", "value":"1" }
+		]
+	},{
+		"id": "P&L 2",
+		"mdx": [
+      "SELECT  {   {[Period].[Year].children}   } ON COLUMNS,",
+      "NON EMPTY {   {[Department].[All Category],[Department].[All Category].children} }  ON ROWS",
+      "FROM [General Ledger]",
+      "WHERE ([Year].[{{Year}}],[Version].[Actual] ,[Account].[{{Account}}], [General Ledger Measure].[Amount], [Region].[{{Region}}], [Currency].[Local])" 
+    ],
+		"description":"",
+		"mdxParams": [
+			{ "name":"Year", "value":"2012" },
+      { "name":"Region", "value":"3" },
+      { "name":"Period", "value":"Year" },
+      { "name":"Account", "value":"1" },
+      { "name":"Department", "value":"1" }
+		]
+	},{
+		"id": "P&L 3",
+		"mdx": [
+      "SELECT  {   {[Period].[Year].children}    } ON COLUMNS,",
+      "NON EMPTY { [Region].[{{Region}}],[Region].[{{Region}}].children  }  ON ROWS",
+      "FROM [General Ledger]",
+      "WHERE ([Year].[{{Year}}],[Version].[Actual], [Department].[{{Department}}],  [Account].[{{Account}}], [General Ledger Measure].[Amount],   [Currency].[Local])" 
+    ],
+		"description":"",
+		"mdxParams": [
+			{ "name":"Year", "value":"2012" },
+      { "name":"Region", "value":"3" },
+      { "name":"Period", "value":"Year" },
+      { "name":"Account", "value":"1" },
+      { "name":"Department", "value":"1" }
+		]
+	},
+	{
+    "id": "Data Entry",
+    "mdx": [
+      "SELECT {[Period].[Year], [Period].[Jan], [Period].[Feb], [Period].[Mar], [Period].[Apr], [Period].[May], [Period].[Jun], [Period].[Jul], [Period].[Aug], [Period].[Sep], [Period].[Oct], [Period].[Nov], [Period].[Dec]} ON COLUMNS,",
+      "{   TM1DRILLDOWNMEMBER( {[Account].[Net Income]}, ALL, RECURSIVE ) } ON ROWS",
+      "FROM [General Ledger]",
+      "WHERE ([Year].&[{{Year}}], [Region].&[{{Region}}], [General Ledger Measure].&[Amount], [Currency].&[Local], [Version].&[Budget], [Department].&[{{Department}}])" 
+    ],
+    "description":"",
+    "mdxParams": [
+      { "name":"Year", "value":"2012" },
+      { "name":"Region", "value":"3" },
+      { "name":"Department", "value":"2" }
+    ]
+  }, 
+  {
+    "id": "Region By Departments",
+    "mdx": [
+      "SELECT {[Period].[Year].children } ON COLUMNS,",
+      " { ORDER({TM1DRILLDOWNMEMBER( {[Department].[All Category]}, ALL, RECURSIVE )  }, [Employee Measure].[Full Time Base Salary], BDESC ) } ON ROWS",
+      "FROM [Employee]",
+      "where ( [Version].[Budget], [Year].&[{{Year}}] , [Currency].[Local], [Region].&[{{Region}}], [Employee].[All Employees],[Employee Measure].[Full Time Base Salary] )" 
+    ],
+    "description":"",
+    "mdxParams": [
+      { "name":"Year", "value":"2015" },
+      { "name":"Region", "value":"1" },
+      { "name":"Department", "value":"1" }
+    ]
+  },
+  {
+    "id": "Department By Regions",
+    "mdx": [
+      "SELECT {[Period].[Year].children } ON COLUMNS,",
+      " {   ORDER({ TM1DRILLDOWNMEMBER( {[Region].[Total Europe]}, ALL, RECURSIVE ) }, [Employee Measure].[Full Time Base Salary], BDESC ) } ON ROWS",
+      "FROM [Employee]",
+      "where ( [Version].[Budget], [Year].&[{{Year}}] , [Currency].[Local], [Department].&[{{Department}}],  [Employee Measure].[Full Time Base Salary] )" 
+    ],
+    "description":"",
+    "mdxParams": [
+      { "name":"Year", "value":"2015" },
+      { "name":"Region", "value":"1" },
+      { "name":"Department", "value":"1" }
+    ]
+  },
+  {
+    "id": "Employee Forecast",
+    "mdx": [
+      "SELECT {[Period].[Year], [Period].[Year].children } ON COLUMNS,",
+      " {   TM1DRILLDOWNMEMBER( {[Employee].[All Employees]}, ALL, RECURSIVE ) } ON ROWS",
+      "FROM [Employee]",
+      "where ( [Version].[Budget], [Year].&[{{Year}}] , [Currency].[Local], [Region].&[{{Region}}], [Department].&[{{Department}}], [Employee Measure].[Full Time Base Salary] )" 
+    ],
+    "description":"",
+    "mdxParams": [
+      { "name":"Year", "value":"2015" },
+      { "name":"Region", "value":"1" },
+      { "name":"Department", "value":"1" }
+    ]
+  },
+  {
+    "id": "Calendar",
+    "mdx": [
+      "SELECT TM1SubsetToSet([Calendar Measure], \"Default\") ON COLUMNS,",
+      "NON EMPTY {TM1DRILLDOWNMEMBER( {[Period Daily].[{{Period}}].children }, ALL, RECURSIVE )} * {[Item].[All items].children]} ON ROWS",
+      "FROM [Calendar]",
+      "where ( [Version].[Actual],  [}Clients].[{{Client}}] )" 
+    ],
+    "description":"",
+    "mdxParams": [
+      { "name":"Period", "value":"2019" },
+      { "name":"Client", "value":"Admin" }
+      
+    ]
+  }
+   
+]

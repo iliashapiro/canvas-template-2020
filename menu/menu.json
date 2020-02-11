@@ -1,0 +1,28 @@
+[
+  {
+    "label": "C3 Chart + Table Directive",
+    "icon_class": "fa-file-text-o",
+    "children": [
+      {
+        "label": "C3 Multi Chart",
+        "icon_class": "fa-file-text-o",
+        "data": {
+          "page": "c3directive/c3charts"
+        },
+        "expanded": false
+      },
+      {
+        "label": "C3 Waterfall Chart",
+        "icon_class": "fa-file-text-o",
+        "data": {
+          "page": "c3directive/c3waterfall"
+        },
+        "expanded": false
+      }
+    ],
+    "data": {
+      "page": "c3directive"
+    },
+    "expanded": true
+  }
+]
