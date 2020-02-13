@@ -1,6 +1,6 @@
 <div ng-controller="C3DirectiveCtrl"  
 ng-if=" $root.defaults.year && $root.defaults.region && $root.defaults.period && $root.defaults.account && $root.defaults.department "
-ng-style="{'margin-top': $root.isPrinting ? '0px':(120)+'px'}"
+ng-style="{'margin-top': !$root.isPrinting ? '120px':(0)+'px'}"
 style="   background-color: transparent; padding-top:10px;  -webkit-transition:margin-top 1s; transition-property:margin-top; transition-duration: 1s;" 
 ng-click="$root.topOffSet = $root.defaultOffSet; $root.indexOver = '';" 
  > 
@@ -19,6 +19,23 @@ ng-click="$root.topOffSet = $root.defaultOffSet; $root.indexOver = '';"
 			 cursor: pointer;
 			 color: white;
 	 }
+	 .modal {
+  overflow: hidden;
+}
+.modal:focus {
+  outline: 0;
+}
+.modal {
+     
+    background-color: transparent !important;
+    background-position: center;
+}
+.modal {
+     pointer-events:none;
+	 background-color: transparent !important;
+	 background-position: center;
+ }
+
 </style>
  <!-- <div class="row"    >
  	<div class="col-md-12">
@@ -29,9 +46,136 @@ ng-click="$root.topOffSet = $root.defaultOffSet; $root.indexOver = '';"
 	</div>
 </div>   -->
 <div class="row"    >
- 
+	<div class="col-md-12 col-xs-12 " style="padding:0px;">
 
-	  <c3-namedmdx-chart 
+		 
+		<div class="col-md-4 col-xs-12 " style="margin-bottom:5px; padding:10px; z-index:9999">
+			<c3-namedmdx-chart 
+				chart-target-id = "5"
+				component-height = "auto"
+				dimension-column-width="150"
+				mdx-id="P&L SUBNM"  
+				heading="{{$root.defaults.year}} Revenue by Account  "
+				cube-name="General Ledger"  
+				mdx-param='{{mdxParam}}'
+				dimension-alias="{{dimensionAlias}}"
+				class-name="col-md-12 pull-left" 
+				show-chart=""
+				hide-chart="true"  
+				chart-type="area"  
+				chart-driver="period" 
+				chart-dimension-driver= "Period"
+				chart-row-driver="account"
+				chart-row-driver-dimension-name="Account"
+				chart-row-dimension-driver= "1"
+				chart-dimension-colors = ""
+				chart-position="outside"
+				chart-ledgends-show=""
+				chart-rotate-axis="false"
+				decimal-format-val = "{{$root.defaults.decimalPlace}}"
+				filter-mode = "true"
+				filter-show-cells = "true"
+				>
+			
+			</c3-namedmdx-chart>  
+	</div>
+	<div class="col-md-4 col-xs-12 " style="margin-bottom:5px; padding:10px; z-index:9998">
+		<c3-namedmdx-chart 
+			chart-target-id = "6"
+			component-height = "auto"
+			dimension-column-width="150"
+			mdx-id="P&L SUBNM Department"  
+			heading="{{$root.defaults.year}} Revenue by Account  "
+			cube-name="General Ledger"  
+			mdx-param='{{mdxParam}}'
+			dimension-alias="{{dimensionAlias}}"
+			class-name="col-md-12 pull-left" 
+			show-chart=""
+			hide-chart="true"  
+			chart-type="area"  
+			chart-driver="period" 
+			chart-dimension-driver= "Period"
+			chart-row-driver="department"
+			chart-row-driver-dimension-name="Department"
+			chart-row-dimension-driver= "1"
+			chart-dimension-colors = ""
+			chart-position="outside"
+			chart-ledgends-show=""
+			chart-rotate-axis="false"
+			decimal-format-val = "{{$root.defaults.decimalPlace}}"
+			filter-mode = "true"
+			filter-show-cells = "true"
+			>
+		
+		</c3-namedmdx-chart>    
+		</div>
+		<div class="col-md-4 col-xs-12 " style="margin-bottom:5px; padding:10px;  z-index:9997">
+			<c3-namedmdx-chart 
+				chart-target-id = "7"
+				component-height = "auto"
+				dimension-column-width="150"
+				mdx-id="P&L SUBNM Region"  
+				heading="{{$root.defaults.year}} Revenue by Account  "
+				cube-name="General Ledger"  
+				mdx-param='{{mdxParam}}'
+				dimension-alias="{{dimensionAlias}}"
+				class-name="col-md-12 pull-left" 
+				show-chart=""
+				hide-chart="true"  
+				chart-type="area"  
+				chart-driver="period" 
+				chart-dimension-driver= "Period"
+				chart-row-driver="region"
+				chart-row-driver-dimension-name="Region"
+				chart-row-dimension-driver= "1"
+				chart-dimension-colors = ""
+				chart-position="outside"
+				chart-ledgends-show=""
+				chart-rotate-axis="false"
+				decimal-format-val = "{{$root.defaults.decimalPlace}}"
+				filter-mode = "true"
+				filter-show-cells = "true"
+				>
+			
+			</c3-namedmdx-chart>    
+			</div>
+	</div>
+</div>
+<div class="row">
+		<div class="col-md-12 " style="padding:0px;">
+			<c3-namedmdx-chart 
+			chart-target-id = "8"
+			component-height = "auto"
+			dimension-column-width="150"
+			mdx-id="P&L SUBNM Region"  
+			heading="{{$root.defaults.year}} Revenue by Account  "
+			cube-name="General Ledger"  
+			mdx-param='{{mdxParam}}'
+			dimension-alias="{{dimensionAlias}}"
+			class-name="col-md-12 pull-left" 
+			show-chart=""
+			hide-chart="true"  
+			chart-type="area"  
+			chart-driver="period" 
+			chart-dimension-driver= "Period"
+			chart-row-driver="region"
+			chart-row-driver-dimension-name="Region"
+			chart-row-dimension-driver= "1"
+			chart-dimension-colors = ""
+			chart-position="outside"
+			chart-ledgends-show=""
+			chart-rotate-axis="false"
+			decimal-format-val = "{{$root.defaults.decimalPlace}}" 
+			justify-list="true"
+			filter-show-cells = "true"
+			>
+		
+		</c3-namedmdx-chart>    
+		</div>
+</div>
+<div class="row"    >
+ 
+ <c3-namedmdx-chart 
 		chart-target-id = "1"
 		component-height = "300"
 		dimension-column-width="150"
@@ -53,7 +197,7 @@ ng-click="$root.topOffSet = $root.defaultOffSet; $root.indexOver = '';"
 		chart-position="inside"
 		chart-ledgends-show=""
 		chart-rotate-axis="false"
-		decimal-format-val = "0"
+		decimal-format-val = "{{$root.defaults.decimalPlace}}"
 		>
 	</c3-namedmdx-chart>    
 	 
@@ -79,7 +223,7 @@ chart-dimension-colors = "{{dimensionColors}}"
 chart-position="inside"
 chart-ledgends-show=""
 chart-rotate-axis="false"
-decimal-format-val = "0">
+decimal-format-val = "{{$root.defaults.decimalPlace}}">
 </c3-namedmdx-chart>    
 <c3-namedmdx-chart 
 chart-target-id = "3"
@@ -103,11 +247,11 @@ chart-dimension-colors = "{{dimensionColors}}"
 chart-position="inside"
 chart-ledgends-show=""
 chart-rotate-axis="false"
-decimal-format-val = "0">
-</c3-namedmdx-chart>    
+decimal-format-val = "{{$root.defaults.decimalPlace}}">
+</c3-namedmdx-chart>     
  
  </div>
- <div class="row"    >
+  <div class="row"    >
 		<c3-namedmdx-chart 
 		chart-target-id = "4"
 		component-height = "auto"
@@ -120,8 +264,7 @@ decimal-format-val = "0">
 		class-name="col-md-12" 
 		show-chart=""
 		hide-chart="true"  
-		chart-type="area" 
-		 
+		chart-type="area"  
 		chart-driver="period" 
 		chart-dimension-driver= "Period"
 		chart-row-driver="account"
@@ -131,10 +274,56 @@ decimal-format-val = "0">
 		chart-position="outside"
 		chart-ledgends-show=""
 		chart-rotate-axis="false"
-		decimal-format-val = "0">
+		decimal-format-val = "{{$root.defaults.decimalPlace}}">
 
-	</c3-namedmdx-chart>    
+	</c3-namedmdx-chart>  
+ 
 	</div>
+	 
+ 
+	<div id="myModal" style="pointer-events:none !important; z-index:99999999; "  class="modal fade bs-example-modal-lg" tabindex="-1"  role="dialog"  data-backdrop="false"   role="dialog" tabindex="-1">  
+	<div class="modal-dialog" style="pointer-events:none !important;">
+	  <div class="modal-content"   style="pointer-events:auto;  overflow:auto ; min-height:250px; ">
+		<div class="modal-header" >
+		  <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+		  <h4 class="modal-title"  uib-popover-html="seeParam(mdxParam)"
+		  popover-trigger="'mouseenter'" popover-placement="right-top">Cube: {{$root.cellreferenceCube}}</h4>
+		</div>
+		<div class="modal-body" >
+			<table class="table">
+				<tbody>
+					<tr>
+					 
+						<td class="text-right" colspan="2" style="font-weight:bold; font-size:1.3em;">
+							<tm1-ui-dbr   
+							tm1-instance="{{$root.defaults.settingsInstance}}" 
+							tm1-cube="{{$root.cellreferenceCube}}" 
+							tm1-elements="{{($root.cellreferenceArray).toString()}}" 
+							tm1-data-decimal="0" 
+							></tm1-ui-dbr>
+						</td>
+					</tr>
+					<tr ng-repeat="row in $root.dimensionArray track by $index">
+						<td class="text-left">
+							{{row}}
+						</td>
+						<td class="text-right">
+							{{$root.cellreferenceArray[$index]}}
+						</td>
+					</tr>
+				</tbody>
+				 
+		
+			</table>
+		  <!-- <small>btw: if you drag me around, close and reopen me i will appear
+			where you left me off. At least in Chrome, it seems.</small> -->
+		</div>
+		 
+	  </div>
+	</div>
+  </div>
 	 
 
 </div>
+
+ 
