@@ -11,8 +11,13 @@ function($scope, $rootScope, $log, $tm1Ui, $transitions,$location, $timeout, glo
     
      //APP COLORS//
     $rootScope.applicationHeaderColor='#000';
-    $rootScope.applicationActivePageColor = '#fed030';
-    $rootScope.applicationHeaderColorSecondary='#000';
+    $rootScope.applicationBodyColor='#000';
+    $rootScope.applicationComponentBorder = '2px solid #d83150';
+    $rootScope.applicationActivePageColor = '#d83150';
+    $rootScope.applicationActiveTextColor = '#fff';
+    $rootScope.applicationTitleColor = '#fff';
+    $rootScope.applicationActivePageDarkColor = '#d80f0f';
+    $rootScope.applicationHeaderColorSecondary='#333';
     $rootScope.applicationHeaderColorSelect = '#4F81BD';
     $rootScope.applicationHeaderColorBudget = ' #bdbdbd';
     $rootScope.applicationHeaderColorLastYear = '#e91042';
@@ -89,7 +94,7 @@ function($scope, $rootScope, $log, $tm1Ui, $transitions,$location, $timeout, glo
             company:"",
             department:"",
             settingsInstance: 'dev',
-            
+             
             settingsCube: 'System User Settings',
             settingsMeasure: 'String',
             months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 
@@ -442,6 +447,17 @@ function($scope, $rootScope, $log, $tm1Ui, $transitions,$location, $timeout, glo
                                 onlyShow:'Home,C3 Directive'
                                 
                                
+                            }, 
+                            {
+                                name:'measure',
+                                dimensionName:'General Ledger Measure',
+                                displayName:'Measure',
+                                dimensionSubset:'Default',
+                                defaultElement:'Amount', 
+                                selectOnly:false,
+                                onlyShow:'Home,C3 Directive'
+                                
+                               
                             }
                            
                       
@@ -787,18 +803,20 @@ function($scope, $rootScope, $log, $tm1Ui, $transitions,$location, $timeout, glo
     $rootScope.createCSSSelector('.tm1-login-modal','pointer-events:none; background-repeat: no-repeat; background-attachment: fixed; background-position: top center; background-color: '+$rootScope.applicationHeaderColor+';');
     $rootScope.createCSSSelector('.tm1-login-modal .panel-default > .panel-heading', 'color: #fff; padding-top: 40px; padding-bottom: 20px; background-repeat: no-repeat; background-position: 50% 50%; border-color: transparent; background-color: '+'rgba(0,0,0,0.3)'+' !important;');
     $rootScope.createCSSSelector('.right-hand-nav', 'position:fixed; left:100%; height:100%; width:300px; background-color: '+$rootScope.applicationHeaderColorSecondary+'; top:0px; -webkit-transition: margin-top 500ms ease-out ; -moz-transition: margin-top 500ms ease-out ; -o-transition: margin-top 500ms ease-out ; transition: margin-top 500ms ease-out ; ');
-    $rootScope.createCSSSelector('.navbuttons .active', 'display: inline-block; vertical-align: top; background-color: #fff; border: 0px solid #ddd; color:'+$rootScope.applicationHeaderColorSecondary+' !important; ');
-    $rootScope.createCSSSelector('.navbuttons .active a', ' background-color: '+$rootScope.applicationActivePageColor+';  color:'+$rootScope.applicationHeaderColorSecondary+' !important; ');
+    $rootScope.createCSSSelector('.navbuttons .active', 'display: inline-block; vertical-align: top; background-color: #fff; border: 0px solid #ddd; color:'+$rootScope.applicationActiveTextColor+' !important; ');
+    $rootScope.createCSSSelector('.navbuttons .active a', ' background-color: '+$rootScope.applicationActivePageColor+';  color:'+$rootScope.applicationActiveTextColor+' !important; ');
     $rootScope.createCSSSelector('.navbuttons li', 'display: inline-block; vertical-align: top; background-color: '+$rootScope.applicationHeaderColorSecondary+'; border: 0px solid #ddd; color: #fff !important; ');
     $rootScope.createCSSSelector('.selected-bg',' background-color: '+$rootScope.applicationHeaderColorSelect+'; color:#fff; ');
     $rootScope.createCSSSelector('.bullet .actual.a','  fill:  '+$rootScope.applicationHeaderColorSelect+'; ');
     $rootScope.createCSSSelector('.bullet .measure.d0','  fill: '+$rootScope.applicationHeaderColorBudget+' ');
     $rootScope.createCSSSelector('.bullet .marker','  stroke: '+$rootScope.applicationHeaderColorLastYear+'; stroke-width: 2px; ');
-     $rootScope.createCSSSelector('.active-subtab','  background-color: '+$rootScope.applicationActivePageColor+'; color: '+ $rootScope.applicationHeaderColorSecondary);
-     $rootScope.createCSSSelector('.rolledOverTab','  background-color: '+$rootScope.applicationActivePageColor+'; color: '+ $rootScope.applicationHeaderColorSecondary);
+     $rootScope.createCSSSelector('.active-subtab','  background-color: '+$rootScope.applicationActivePageColor+'; color: '+ $rootScope.applicationActiveTextColor);
+     $rootScope.createCSSSelector('.rolledOverTab','  background-color: '+$rootScope.applicationActivePageColor+'; color: '+ $rootScope.applicationActiveTextColor);
      $rootScope.createCSSSelector('#c3_waterfall_chart .c3-target-hide-line .c3-lines, #c3_waterfall_chart .c3-target-hide-line .c3-circles',' display:none');
+     $rootScope.createCSSSelector('html, body',' background-color:'+$rootScope.applicationBodyColor+' !important');
+     $rootScope.createCSSSelector('.input-group-addon','  padding: 6px 12px; font-size: 14px; font-weight: normal; line-height: 1; color: '+$rootScope.applicationActiveTextColor+' !important; border:0px solid transparent !important;text-align: center; background-color: '+$rootScope.applicationActivePageColor+' !important; border: 1px solid #ccc;  border-radius: 4px;');
      $rootScope.createCSSSelector('.btn-primary' ,'color: #fff; background-color: '+$rootScope.applicationHeaderColorSecondary+' !important; color: #fff; border: none !important;');
- 
+  $rootScope.createCSSSelector('::-webkit-scrollbar-thumb',' cursor:pointer; background: '+$rootScope.applicationActivePageColor+'; box-shadow: 0px 5px 10px rgba(0,0,0,0.3) ;  background-image: linear-gradient('+$rootScope.applicationActivePageDarkColor+', '+$rootScope.applicationActivePageColor+', '+$rootScope.applicationActivePageDarkColor+');');
   
 
     $rootScope.countIdel = 0;
@@ -946,7 +964,7 @@ function($scope, $rootScope, $log, $tm1Ui, $transitions,$location, $timeout, glo
     $rootScope.triggerResize = function(){
         $timeout(function() {
             $window.dispatchEvent(new Event("resize"));
-        }, 500);
+        }, 100);
      }
     $(window).resize(function() { 
         $timeout(
@@ -994,7 +1012,7 @@ function($scope, $rootScope, $log, $tm1Ui, $transitions,$location, $timeout, glo
         
 }]);
 
-
+ 
 app.filter('capitalize', function() {
     return function(token) {
         var stringTotest = '';

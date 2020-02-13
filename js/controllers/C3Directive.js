@@ -15,7 +15,7 @@ app.controller('C3DirectiveCtrl', ['$scope', '$rootScope', '$log', '$tm1Ui','$ti
     $scope.values = {};
     $rootScope.charts = [];
     $rootScope.pageTitle = 'C3 Directive';
-    $scope.dimensionAlias = { "alias": { "Account":"Description", "Period":"Description" } };
+    $scope.dimensionAlias = { "alias": { "Account":"Description", "Period":"Description", "Department":"Description", "Region":"Description" } };
     $rootScope.dimensionColors = {  "OperatingExpenses":"darkorange", "Commissions":"steelblue","SalesandMarketing":"red", "OfficeFurniture&Equipment":"#1355ce" };
     $scope.mdxParam = { "parameters": {  
          
@@ -23,21 +23,59 @@ app.controller('C3DirectiveCtrl', ['$scope', '$rootScope', '$log', '$tm1Ui','$ti
         "Period":$rootScope.defaults.period,
         "Region":$rootScope.defaults.region,
         "Account":$rootScope.defaults.account,
-        "Department":$rootScope.defaults.department
+        "Department":$rootScope.defaults.department,
+        "Measure":$rootScope.defaults.measure
        } };
 
-    
+       $('.modal-content').resizable({
+        //alsoResize: ".modal-dialog",
+        minHeight: 300,
+        minWidth: 300
+      });
+      $('.modal-dialog').draggable();
+  
+      $('#myModal').on('show.bs.modal', function() {
+        $(this).find('.modal-body').css({
+          'max-height': '100%'
+        });
+      });
+           
+       $rootScope.openRefModel = function(elementString, cubeName){
+         
+                //$rootScope.dimensionArray = elementString;
+                
+                if((elementString+'').split(',').length > 0){
+                    
 
+                     $rootScope.cellreferenceArray = (elementString+'').split(',');
+                     $rootScope.cellreferenceCube = cubeName;
+                     $tm1Ui.cubeDimensions($rootScope.defaults.settingsInstance,cubeName).then(function(result){
+                         $rootScope.dimensionArray = result;
+                         $("#myModal").modal({show: true});
+                        
+                        
+                     })
+                 }
+                
+            
+                
+            }
     
     $rootScope.$watchCollection( 'defaults', function(newNames, oldNames) {
         console.log("watch collection   ", newNames);
         
+        if($rootScope.defaults.measure === 'Amount M' || $rootScope.defaults.measure === 'Amount Percentage'  ){
+            $rootScope.defaults.decimalPlace = 2;
+        }else{
+            $rootScope.defaults.decimalPlace = 0;
+        }
         $scope.mdxParam = { "parameters": {  
             "Year":$rootScope.defaults.year,
             "Period":$rootScope.defaults.period,
             "Region":$rootScope.defaults.region,
             "Account":$rootScope.defaults.account,
-            "Department":$rootScope.defaults.department
+            "Department":$rootScope.defaults.department,
+            "Measure":$rootScope.defaults.measure
         
         }}
         $scope.loading = true;
@@ -50,7 +88,19 @@ app.controller('C3DirectiveCtrl', ['$scope', '$rootScope', '$log', '$tm1Ui','$ti
           
      });
 
- 
+    
       
 }
 ]);
+app.directive('ngRightClick', ['$parse', function($parse) {
+    return function(scope, element, attrs) {
+        var fn = $parse(attrs.ngRightClick);
+        element.bind('contextmenu', function(event) {
+            scope.$apply(function() {
+                event.preventDefault();
+                fn(scope, {$event:event});
+                 
+            });
+        });
+    };
+}]);

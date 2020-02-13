@@ -26,7 +26,10 @@
                 chartLedgendsShow:'@',
                 chartRotateAxis:"@",
                 chartRowDriverDimensionName:'@',
-                chartLedgendPosition:'@'
+                chartLedgendPosition:'@',
+                filterMode:'@',
+                filterShowCells:'@',
+                justifyList:'@'
           }, 
           link:function(scope, $elements, $attributes, directiveCtrl, transclude){
             scope.componentHeight = $attributes.componentHeight;
@@ -43,6 +46,7 @@
              };
              scope.chart = null;
             scope.decimalFormat = $attributes.decimalFormatVal;
+            console.log(scope.decimalFormat, "format");
              scope.config = {};
              scope.config.data = {};
              scope.config.type = {};
@@ -51,7 +55,7 @@
              scope.arrayOfGeneratedColor = [];
              scope.dimensionAlias = [];
              scope.chartDriverPosition = [];
-        
+             scope.filterMode = $attributes.filterMode;
              scope.dimensionAlias =  JSON.parse($attributes.dimensionAlias);
              scope.cubename = $attributes.cubeName;
              scope.chartType = $attributes.chartType;
@@ -62,13 +66,16 @@
              scope.chartRowDimensionDriver = $attributes.chartRowDimensionDriver;
              scope.chartRowDriverDimensionName = $attributes.chartRowDriverDimensionName;
              scope.className = $attributes.className;
+             scope.filterShowCells = $attributes.filterShowCells;
              scope.chartLedgendsShow = $attributes.chartLedgendsShow;
              scope.arrayOfGeneratedColor[scope.chartTargetId]  = [];
              scope.indicatorXAxis    = [];
              scope.hideChart = $attributes.hideChart;
              scope.searchField = [];
+             scope.justifyList = $attributes.justifyList;
              scope.chartLedgendPosition = $attributes.chartLedgendPosition;
-
+             scope.rowDimensionAttribute = scope.dimensionAlias['alias'][scope.chartRowDriverDimensionName];
+            // console.log(scope.dimensionAlias['alias'][scope.chartRowDriverDimensionName], "scope.dimensionAlias")
                  scope.getAttributeOfElement = function(dimension , key, attribute){
                         
                     $tm1Ui.dimensionElement($rootScope.defaults.settingsInstance, dimension, key,  attribute).then(function(result){
@@ -139,8 +146,9 @@
                 };
                 scope.chartDriverPosition[scope.chartTargetId] =  returnVal;
              }
-          
+               
              scope.getData = function(){
+                scope.findElementPosition($rootScope.defaults[scope.chartDriver], scope.config.categories );
                 scope.loading = true;
                 scope.config.data = {};
                 scope.config.categories = [];
@@ -170,10 +178,10 @@
                                 scope.config.categories.push(el.key) 
                             }
                             
-                         });
-                          
-                          
-                       
+                        });
+                        scope.arrayOfGeneratedColor[scope.chartTargetId] = [];
+                        scope.findElementPosition($rootScope.defaults[scope.chartDriver], scope.config.categories );
+                         
                          
                          _.forEach(scope.table.data(),function(el,rowIndex,arr){
                              _.forEach(arr[rowIndex]['elements'],function(el,rowIndex,arr){
@@ -212,8 +220,16 @@
                              scope.config.type['type'+rowIndex] = [];
                                  
                                  for(var tt = 0 ; tt < arr[rowIndex]['cells'].length; tt++){
+                                     var temppercentVal =  ( (arr[rowIndex]['cells'][tt].value) )* 100;
+                                    var percentVal =   parseFloat(temppercentVal).toFixed(2)
+                                        // console.log("percentVal", percentVal )
+                                     if(scope.decimalFormat === '2'){
+                                         
+                                        scope.config.data[nameToUse].push(percentVal);
+                                     }else{
+                                        scope.config.data[nameToUse].push(parseInt(arr[rowIndex]['cells'][tt].value));
+                                     }
                                      
-                                 scope.config.data[nameToUse].push(parseInt(arr[rowIndex]['cells'][tt].value));
                                  }   
                                  
                                  scope.config.type['type'+rowIndex ] = scope.chartType;
@@ -271,19 +287,26 @@
      
 
               scope.refreshData = function(){
-                  
+                scope.findElementPosition($rootScope.defaults[scope.chartDriver], scope.config.categories );
                 $timeout(
                     function(){
+                        var dataSetClone = scope.dataset;
                         scope.loading = true;
                         $rootScope.loading = true;
                         scope.config.data = {};
                         scope.config.categories = [];
                         scope.config.series = [];
                          scope.config.series[scope.chartTargetId]= [];
+
+
                         $tm1Ui.cubeExecuteNamedMdx($rootScope.defaults.settingsInstance, scope.mdxId, scope.mdxParam).then(function (result) {
                             if (!result.failed) {
                             
                                 scope.dataset = $tm1Ui.resultsetTransform($rootScope.defaults.settingsInstance, scope.cubeName, result, scope.dimensionAlias);
+                                _.forEach(dataSetClone.rows,function(el,rowIndex,arr){
+                                    console.log(el,rowIndex,arr, "new CLONE Dataset row")
+                                })
+                                
                                 _.forEach(scope.dataset.rows,function(el,rowIndex,arr){
                                     console.log(el,rowIndex,arr, "new Dataset row")
                                 })
@@ -298,6 +321,11 @@
                                 scope.table = $tm1Ui.tableCreate(scope, scope.dataset.rows, options);
                                 scope.loading = false;
                                 $rootScope.loading = true;
+
+
+
+
+                                
                                 // console.log(scope.table.data());
                                 _.forEach(scope.dataset.headers[0].columns,function(el,rowIndex,arr){
                                     if(el['element']['attributes']['Description'] != undefined){
@@ -308,7 +336,7 @@
                                     
                                 });
                                 scope.arrayOfGeneratedColor[scope.chartTargetId] = [];
-                                scope.findElementPosition($rootScope.defaults[scope.chartDriver],scope.config.categories );
+                                scope.findElementPosition($rootScope.defaults[scope.chartDriver], scope.config.categories );
                                 _.forEach(scope.table.data(),function(el,rowIndex,arr){
                                     if(arr[rowIndex]['elements']['0']['element']['attributes']['Description'] != arr[rowIndex]['elements'][arr[rowIndex]['elements'].length-1]['element']['attributes']['Description']){
                                         scope.config.series.push(arr[rowIndex]['elements']['0']['element']['attributes']['Description']+ '^' + arr[rowIndex]['elements'][arr[rowIndex]['elements'].length-1]['element']['attributes']['Description']);
@@ -364,25 +392,32 @@
                 
              }
              
+             scope.consolidatedRowValue = function(cells){
+                 var returnConsol = 0;
+                 _.forEach(cells,function(el,rowIndex,arr){
+                    returnConsol = returnConsol + arr[rowIndex].value ;
+                 });
+                 return returnConsol;
+             }
  
              scope.createChart = function() {
-             
+              scope.loading = true;
                  $timeout(
                      function(){
                          
                         if(scope.chartLedgendsShow ){
-                            var currentWidth =  scope.getElementWidth('body'+scope.chartTargetId);
+                            var currentWidth =  scope.getElementWidth('c3chart1'+scope.chartTargetId)+60;
                         }else{
-                            var currentWidth =  scope.getElementWidth('body'+scope.chartTargetId);
+                            var currentWidth =  scope.getElementWidth('c3chart1'+scope.chartTargetId);
                         }
                       
 
-                         var currentHeight =  scope.getElementHeight('c3chart'+scope.chartTargetId);
+                         var currentHeight =  scope.getElementHeight('c3chart'+scope.chartTargetId)-25;
                          if(scope.componentHeight != 'auto'){
-                              if(currentHeight > scope.componentHeight ){
+                              if(currentHeight > scope.componentHeight  ){
                              
                             }else{
-                                currentHeight  =  scope.componentHeight-5
+                                currentHeight  =  scope.componentHeight-35
                             }
                          }else{
                               currentHeight  =  300
@@ -483,8 +518,10 @@
                                    "y":{
                                        "label":{
                                            "text":$rootScope.defaults.measure,
-                                           "position":"inner-right"}
+                                           "position":"inner-right"
+                                        }
                                    }
+                                   
                                };
                             }else{
                                 config.axis = {
@@ -539,9 +576,10 @@
                               
                          }
                           scope.getAttributeOfElement(scope.chartDimensionDriver, $rootScope.defaults[scope.chartDriver], 'Description');
+                              
                     $timeout(
                         function(){
-                             config.grid =  {  "x":{ "lines":[{"value": scope.chartDriverPosition[scope.chartTargetId], "text": scope.indicatorXAxis[scope.chartTargetId] } ]}}
+                          config.grid =  {  "x":{ "lines":[{"value": scope.chartDriverPosition[scope.chartTargetId], "text": scope.indicatorXAxis[scope.chartTargetId] } ]}}
                          //config.data.groups=[['data1','data2']];
                          //config.regions = [{start:0, end:1}];
                          config.area = { zerobased: false};
@@ -552,19 +590,25 @@
                          function toggle(id) {
                             if(scope.chart != null){
                              scope.chart.toggle(id);
+                             $timeout(
+                                 function(){
+                                     $window.dispatchEvent(new Event("resize"));
+                                 },1000
+                             )
+                             
                             }
                          }
-                        },1000
+                        },2500
                     )
                          
                  
                      }
                  )
                  scope.seeData = function(data){
-                  console.log(data)
+                 // console.log(data)
                  }
                  scope.mouseDblClickRowElement = function(rowElement, elementName){
-                   // console.log("DBL CLICKED", rowElement);
+                   console.log("DBL CLICKED", rowElement);
                     for(var dd = 0; dd < scope.config.series[scope.chartTargetId].length; dd++){
                         if(scope.config.series[scope.chartTargetId][dd] === elementName){
                              
@@ -603,7 +647,7 @@
                     });
                        
                 }
-                 
+               
                  scope.findaParent= function(row, descript, key, uniqueName){
                         
                     $tm1Ui.dimensionElement($rootScope.defaults.settingsInstance, scope.chartRowDriver, key ).then(function(result){
@@ -689,7 +733,14 @@
                     
                 };
                 scope.setColumnElement = function(columnElement){
-                $rootScope.defaults[(scope.chartDriver)]  = columnElement;
+                    if(!scope.loading){
+
+                         $rootScope.defaults[(scope.chartDriver)]  = columnElement;
+                         
+                    }
+                   
+                   
+                
                 }
             }
             scope.tableLedgendsShow = true;
@@ -729,7 +780,7 @@
                    if(newValue != oldValue && oldValue != undefined){
                         
                       
-                      
+                      console.log(scope.mdxParam,  $rootScope.defaults[scope.chartRowDriver] )
                        
                        scope.getData();
                       
@@ -743,19 +794,49 @@
                 
                  }, function (newValue, oldValue) { 
 
-                    if(newValue != oldValue && oldValue != undefined){
+                   
                          
                         scope.mdxParam =  JSON.parse(newValue);
+
+                   
                         // console.log()
+                        $timeout(
+                            function(){
+                                scope.getData();
+                            },1000
+                        )
                         
-                        scope.getData();
                        
-                    }
+                    
                     
                    
                    
             })
-             
+               scope.$watch(function () {
+                 return $rootScope.defaults.decimalPlace;
+                
+                 }, function (newValue, oldValue) { 
+
+                 
+                        if(newValue != oldValue && newValue != null){
+                                scope.decimalFormat =  (newValue+'');
+                        }
+                         //   scope.decimalFormatVal =  (newValue+'');
+                         
+                         $timeout(
+                            function(){
+                                scope.getData();
+                            },1000
+                        )
+                   
+                        
+                        
+                       
+                    
+                    
+                   
+                   
+            })
              scope.reorderBy = function(toggleBol){
                 // console.log("value show chart", toggleBol);
                  scope.sortBol = false;
@@ -769,49 +850,65 @@
                 scope.createChart();
              }
 
-            scope.getData();
+            
             scope.tableRowTopCount = [];
             scope.setLedgends = function(){
                 console.log(scope.chartLedgendsShow)
                 scope.chartLedgendsShow = !scope.chartLedgendsShow;
             }
+           
             scope.setUpScroll = function(){
+                 
                 $timeout(
                     function(){
 
                         //console.log("scroll set up", scope.chartTargetId,  $('#tableScroll'+scope.chartTargetId))
                         var rowTrArrayppp = document.getElementsByClassName('rowElement'+scope.chartTargetId);
-                        for(var ppp = 0; ppp < rowTrArrayppp.length; ppp++){
+                        if(rowTrArrayppp.length > 0){
+                             for(var ppp = 0; ppp < rowTrArrayppp.length; ppp++){
                            
                             if(rowTrArrayppp[ppp].getBoundingClientRect().top > 0 && rowTrArrayppp[ppp].getBoundingClientRect().top < 800){
                               document.getElementsByClassName('rowElement'+scope.chartTargetId)[ppp].style.visibility = 'visible';
+                              
                              // document.getElementsByClassName('sideRow'+scope.chartTargetId)[ppp].style.visibility = 'visible';
                             }else{
                               document.getElementsByClassName('rowElement'+scope.chartTargetId)[ppp].style.visibility = 'hidden';
+                              //console.log('hidden', ppp)
                              //document.getElementsByClassName('sideRow'+scope.chartTargetId)[ppp].style.visibility = 'visible';
                             }
                              scope.tableRowTopCount[ppp] = rowTrArrayppp[ppp].getBoundingClientRect().top;
                            //console.log(rowTrArray[uu].getBoundingClientRect().top, rowTrArray[uu].getBoundingClientRect() );
                         } 
+                        }
+                        
                         $('#tableScroll'+scope.chartTargetId).scroll(_.debounce(function(){
                          //console.log('SCROLLING!', $(this).scrollTop(), $(this).scrollLeft());
                          var rowTrArraykkk = document.getElementsByClassName('rowElement'+scope.chartTargetId);
-                        for(var kkk = 0; kkk < rowTrArraykkk.length; kkk++){
-                           
-                            if(rowTrArraykkk[kkk].getBoundingClientRect().top > 0 && rowTrArraykkk[kkk].getBoundingClientRect().top < 800){
-                              document.getElementsByClassName('rowElement'+scope.chartTargetId)[kkk].style.visibility = 'visible';
-                             // document.getElementsByClassName('sideRow'+scope.chartTargetId)[kkk].style.visibility = 'visible';
-                            }else{
-                              document.getElementsByClassName('rowElement'+scope.chartTargetId)[kkk].style.visibility = 'hidden';
-                             //document.getElementsByClassName('sideRow'+scope.chartTargetId)[kkk].style.visibility = 'visible';
-                            }
-                             scope.tableRowTopCount[kkk] = rowTrArraykkk[kkk].getBoundingClientRect().top;
-                           //console.log(rowTrArray[uu].getBoundingClientRect().top, rowTrArray[uu].getBoundingClientRect() );
-                        } 
-                         
+                        if(rowTrArraykkk.length > 0){
+                            for(var kkk = 0; kkk < rowTrArraykkk.length; kkk++){
+                            
+                                if(rowTrArraykkk[kkk].getBoundingClientRect().top > 0 && rowTrArraykkk[kkk].getBoundingClientRect().top < 800){
+                                document.getElementsByClassName('rowElement'+scope.chartTargetId)[kkk].style.visibility = 'visible';
+                                // document.getElementsByClassName('sideRow'+scope.chartTargetId)[kkk].style.visibility = 'visible';
+                                }else{
+                                document.getElementsByClassName('rowElement'+scope.chartTargetId)[kkk].style.visibility = 'hidden';
+                               // console.log('hidden', kkk)
+                                //document.getElementsByClassName('sideRow'+scope.chartTargetId)[kkk].style.visibility = 'visible';
+                                }
+                                scope.tableRowTopCount[kkk] = rowTrArraykkk[kkk].getBoundingClientRect().top;
+                            //console.log(rowTrArray[uu].getBoundingClientRect().top, rowTrArray[uu].getBoundingClientRect() );
+                            } 
+                        }
                         
-                          document.getElementById('fixedHeader'+scope.chartTargetId).style.marginLeft = '-'+ $(this).scrollLeft()+'px';
-                          document.getElementById('sidePanel'+scope.chartTargetId).style.marginTop = '-'+ $(this).scrollTop()+'px';
+                         
+                        if(document.getElementById('fixedHeader'+scope.chartTargetId) !=  null){
+                            document.getElementById('fixedHeader'+scope.chartTargetId).style.marginLeft = '-'+ $(this).scrollLeft()+'px';
+                        }
+                        if(document.getElementById('sidePanel'+scope.chartTargetId) != null){
+                            document.getElementById('sidePanel'+scope.chartTargetId).style.marginTop = '-'+ $(this).scrollTop()+'px';
+                        }
+                      //  console.log($(this).scrollTop(),$(this).scrollLeft(), "scrolling")
+                           
                             
                        }, 1, { 'leading': false, 'trailing': true })); 
                        
@@ -820,15 +917,19 @@
                              function(){
                               
                               var rowTrArray = document.getElementsByClassName('rowElement'+scope.chartTargetId);
-                              for(var uu = 0; uu < rowTrArray.length; uu++){
-                                 scope.tableRowTopCount[uu] = rowTrArray[uu].getBoundingClientRect().top;
-                                 //console.log(rowTrArray[uu].getBoundingClientRect().top, rowTrArray[uu].getBoundingClientRect() );
+                              if(rowTrArray.length > 0){
+                                for(var uu = 0; uu < rowTrArray.length; uu++){
+                                    scope.tableRowTopCount[uu] = rowTrArray[uu].getBoundingClientRect().top;
+                                    //console.log(rowTrArray[uu].getBoundingClientRect().top, rowTrArray[uu].getBoundingClientRect() );
+                                }
                               }
+                             
                               
                              }
                           )
                         
                     }, 150));
+                    
                     },1000
                 )
                     
@@ -840,7 +941,7 @@
            // console.log(propertyName, scope.propertyName, "######")
             scope.sortBol = !scope.sortBol;
             scope.tableOrdered = orderBy(scope.dataset.rows, propertyName, scope.sortBol);
-            
+            scope.getLastFocus();
             scope.createChart();
            
           }
@@ -1052,7 +1153,8 @@
              $tm1Ui.cellsetPut(scope.sendCellSetPutArray).then(function(result){
        
                 if(result.success){
-                    scope.refreshData();
+                    console.log("success ")
+                   // scope.refreshData();
                     $rootScope.defaults.refresh = true;
                     $timeout(
                         function(){
@@ -1071,50 +1173,57 @@
              
     }
 
-          scope.saveValue = function(value, id){
+          scope.saveValue = function(value, lastvalue){
               var sendValue = [];
-              
-
-                  var tempO = document.getElementById(id)
-                  
-                  var request = {
-                      value: value, 
-                      instance:$rootScope.defaults.settingsInstance, 
-                      cube: scope.cubeName, 
-                      cubeElements:(scope.focusedInputElementArray).split(',') 
-                      }
-                      sendValue.push(request);
-                       // console.log(request, "######## saved")
-                      $tm1Ui.cellsetPut(sendValue).then(function(result){
-                        
-                           if(result.success){
-                             console.log(result, "######## saved")
-                             scope.refreshData();
-                                 $rootScope.defaults.refresh = true;
-                                 $timeout(
-                                     function(){
-                                        $rootScope.defaults.refresh = false;
-                                        
-                                     },100
-                                 )
-                                  
-                               
-                             
-
-                           }else{
-              
-                           }
-                      });
-           
-              
                
-
+              if(value && value != null){
+                if((value).indexOf('(') > -1){
+                    var valCal = '-'+((value).split('(').join('')).split(')').join('');
+ 
+                  }else{
+                      var valCal = value;
+                  }
+                 if(   valCal === (lastvalue+'') ){
+                    
+                  }else{
+                   
+                    
+                    var request = {
+                        value: valCal, 
+                        instance:$rootScope.defaults.settingsInstance, 
+                        cube: scope.cubeName, 
+                        cubeElements:(scope.focusedInputElementArray).split(',') 
+                        }
+                        sendValue.push(request);
+                         // console.log(request, "######## saved")
+                        $tm1Ui.cellsetPut(sendValue).then(function(result){
+                          
+                             if(result.success){
+                              // console.log(result, "######## saved")
+                              
+                               $rootScope.defaults.refresh = true;
+                                   $timeout(
+                                       function(){ 
+                                        $rootScope.defaults.refresh = false;
+                                            
+                                       },10
+                                   )
+                                    
+                                 
+                               
+    
+                             }else{
+                
+                             }
+                        });
+                  }
+    
+              }
+             
+                  
           }
 
-
-        
-
-
+ 
           }
         };
     }]);
